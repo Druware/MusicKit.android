@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        The hosted page fetches MusicKit JS from js-cdn.music.apple.com and talks to
+        api.music.apple.com and authorize.music.apple.com. The page's own files are served from
+        assets by WebViewAssetLoader and never touch the network, so no network security config
+        entry is needed for appassets.androidplatform.net.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+</manifest>

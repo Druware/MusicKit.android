@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Druware.MusicKit host</title>
+  <!--
+    MusicKit JS is loaded from Apple's CDN and nowhere else. Apple's terms forbid bundling,
+    re-hosting or modifying it, so this reference is the only copy that exists. It loads async and
+    announces itself with a 'musickitloaded' document event, which musickit-host.js waits for (and
+    which may already have fired by the time musickit-host.js runs).
+
+    Nothing here is ever seen: the host runs this page in a 1x1 WebView parked in the activity's
+    content view. The body exists only because MusicKit needs a real document to attach its audio
+    element to.
+
+    This page is served over https://appassets.androidplatform.net/assets/musickit/index.html by
+    WebViewAssetLoader, never over file://. That origin is load-bearing three times over: it is a
+    secure context (EME will not start without one), it gives localStorage somewhere to keep the
+    Music User Token, and it puts a real Origin header on the requests to Apple's CDN and API.
+  -->
+  <script async src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"></script>
+</head>
+<body>
+  <script src="musickit-host.js"></script>
+</body>
+</html>

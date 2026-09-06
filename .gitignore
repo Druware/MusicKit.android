@@ -1,0 +1,35 @@
+# Gradle / Android build output
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.kotlin/
+.cxx/
+captures/
+
+# macOS
+.DS_Store
+
+# Release artifacts
+*.aab
+*.apk
+
+# Signing material
+keystore.properties
+*.jks
+*.keystore
+
+# AI agent files — local only, never commit
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+AGENTS.local.md
+GEMINI.md
+.codex/
+.cursor/
+.cursorrules
+.windsurf/
+.aider*
+.mcp.json
+.claude/

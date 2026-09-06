@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!--
+            The hidden page is a child of an activity's content view, so the instrumented tests
+            need an activity to park it in. This one does nothing else.
+        -->
+        <activity
+            android:name="com.druware.musickit.MusicKitTestActivity"
+            android:exported="false" />
+    </application>
+
+</manifest>
