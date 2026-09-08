@@ -3,12 +3,14 @@
 Apple Music playback in an Android application, by hosting Apple's MusicKit JS v3
 in a WebView nobody ever sees and putting a Kotlin API over it.
 
-Apple ships no native MusicKit for Android. What Apple does ship is MusicKit for
-the Web, which needs a browser for sign-in, DRM and playback. This library runs
-that page in a 1x1 WebView parked in your activity's content view and exposes the
-surface a native MusicKit application would want — authorization, library
-playlists and their tracks, catalog search, playlist creation, and a player —
-as suspending Kotlin functions and `StateFlow`s.
+While Apple ships a native MusicKit for Android, it has not been updated since 
+2021/12/02. Current Android version have made changes that break the existing 
+MusicKit that Apple provides. As a result it may as well not exist. What Apple 
+does ship is MusicKit for the Web, which needs a browser for sign-in, DRM and 
+playback. This library runs that page in a 1x1 WebView parked in your activity's 
+content view and exposes the surface a native MusicKit application would want — 
+authorization, library playlists and their tracks, catalog search, playlist 
+creation, and a player — as suspending Kotlin functions and `StateFlow`s.
 
 ## Requirements
 
@@ -95,6 +97,9 @@ which is the right order of magnitude for an endpoint that takes no credential.
 whoever extracts it can mint tokens against your Apple Developer Program
 membership until you revoke the key. There is no configuration of this library
 that takes a private key, deliberately.
+
+Every development team implementing this must obtain their own token from Apple
+as a part of the Apple Developer program.
 
 ### You run your own endpoint
 
@@ -292,7 +297,7 @@ If you do nothing, the LGPL applies, and it costs nothing. The commercial option
 exists because LGPL section 6 requires that whoever receives your application be
 able to relink it against a modified version of this library, which is difficult
 in practice for a statically linked application distributed through an app store.
-The commercial licence removes that obligation, for those who cannot meet the
+The commercial license removes that obligation, for those who cannot meet the
 LGPL's terms. For one, contact **support@druware.com**.
 
 See [`LICENSE`](LICENSE) for the full notice.
@@ -306,7 +311,7 @@ under the Apache License, Version 2.0.
 **Apple's MusicKit JS is not included in or distributed with this software.** The
 hosted page loads it at runtime from Apple's CDN, and that reference is the only
 copy in this repository. MusicKit JS remains subject to Apple's own terms, which
-this project's licence does not alter and cannot grant rights to — you need your
+this project's license does not alter and cannot grant rights to — you need your
 own Apple Developer Program membership.
 
 Apple, Apple Music and MusicKit are trademarks of Apple Inc. This project is not
