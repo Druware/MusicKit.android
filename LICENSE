@@ -2,22 +2,22 @@ Druware.MusicKit for Android
 Copyright (c) 2026 Druware Software Designs. All rights reserved.
 
 
-DUAL LICENCE
+DUAL LICENSE
 
-This software is available under two licences. You may choose either one.
+This software is available under two licenses. You may choose either one.
 
   (a) The GNU Lesser General Public License, version 2.1, or (at your option)
       any later version. The full text of version 2.1 is in the file
       LICENSE.LGPL-2.1 in this repository, and is also published at
       <https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt>.
 
-  (b) A commercial licence from Druware Software Designs.
+  (b) A commercial license from Druware Software Designs.
 
 If you do nothing, the LGPL applies. Using this software under the LGPL costs
 nothing and requires no agreement with Druware.
 
 
-WHY A COMMERCIAL LICENCE IS OFFERED
+WHY A COMMERCIAL LICENSE IS OFFERED
 
 Section 6 of the LGPL requires that whoever receives your application be able
 to relink it against a modified version of this library. For an application
@@ -25,12 +25,12 @@ that links the library statically and is distributed through an app store,
 meeting that requirement is difficult in practice — the recipient generally has
 no way to relink the binary the store delivered to them.
 
-The commercial licence exists for those who cannot meet the LGPL's terms. It
+The commercial license exists for those who cannot meet the LGPL's terms. It
 removes the relinking obligation. It is an alternative to the LGPL, not a
 restriction on it: nothing here narrows the rights the LGPL grants you, and if
 the LGPL suits your project, you need nothing from Druware.
 
-To obtain a commercial licence, contact:
+To obtain a commercial license, contact:
 
     support@druware.com
 
@@ -39,7 +39,7 @@ NO WARRANTY
 
 This software is provided without warranty of any kind. See sections 15 and 16
 of LICENSE.LGPL-2.1 for the full disclaimer that applies under the LGPL. A
-commercial licence states its own terms.
+commercial license states its own terms.
 
 
 THIRD-PARTY NOTICES
@@ -48,7 +48,7 @@ Gradle wrapper
     The files gradlew, gradlew.bat and gradle/wrapper/gradle-wrapper.jar are
     the Gradle wrapper, Copyright Gradle Inc., licensed under the Apache
     License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>. They
-    are redistributed here unmodified and are not covered by the licences
+    are redistributed here unmodified and are not covered by the licenses
     above.
 
 Apple MusicKit JS
@@ -58,7 +58,7 @@ Apple MusicKit JS
     Apple's content delivery network, and that reference is the only copy that
     exists in this repository.
 
-    MusicKit JS remains subject to Apple's own terms. Nothing in this licence
+    MusicKit JS remains subject to Apple's own terms. Nothing in this license
     alters those terms, and Druware neither holds nor grants any right to
     Apple's software or services. Using this library requires your own Apple
     Developer Program membership and your own agreement with Apple.

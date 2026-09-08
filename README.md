@@ -3,13 +3,13 @@
 Apple Music playback in an Android application, by hosting Apple's MusicKit JS v3
 in a WebView nobody ever sees and putting a Kotlin API over it.
 
-While Apple ships a native MusicKit for Android, it has not been updated since 
-2021/12/02. Current Android version have made changes that break the existing 
-MusicKit that Apple provides. As a result it may as well not exist. What Apple 
-does ship is MusicKit for the Web, which needs a browser for sign-in, DRM and 
-playback. This library runs that page in a 1x1 WebView parked in your activity's 
-content view and exposes the surface a native MusicKit application would want — 
-authorization, library playlists and their tracks, catalog search, playlist 
+While Apple ships a native MusicKit for Android, it has not been updated since
+2021/12/02. Current Android versions have made changes that break the existing
+MusicKit that Apple provides. As a result it may as well not exist. What Apple
+does ship is MusicKit for the Web, which needs a browser for sign-in, DRM and
+playback. This library runs that page in a 1x1 WebView parked in your activity's
+content view and exposes the surface a native MusicKit application would want —
+authorization, library playlists and their tracks, catalog search, playlist
 creation, and a player — as suspending Kotlin functions and `StateFlow`s.
 
 ## Requirements
@@ -99,7 +99,7 @@ membership until you revoke the key. There is no configuration of this library
 that takes a private key, deliberately.
 
 Every development team implementing this must obtain their own token from Apple
-as a part of the Apple Developer program.
+as a part of the Apple Developer Program.
 
 ### You run your own endpoint
 
@@ -285,13 +285,13 @@ Nothing in the instrumented suite signs in or asserts that audio comes out: the
 sign-in popup needs a human, and playback needs a subscription and a device that
 is not the emulator.
 
-## Licence
+## License
 
 Dual-licensed, at your option, under either:
 
 - the **GNU Lesser General Public License, version 2.1 or (at your option) any
   later version** — the full text is in [`LICENSE.LGPL-2.1`](LICENSE.LGPL-2.1); or
-- a **commercial licence** from Druware Software Designs.
+- a **commercial license** from Druware Software Designs.
 
 If you do nothing, the LGPL applies, and it costs nothing. The commercial option
 exists because LGPL section 6 requires that whoever receives your application be
