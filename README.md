@@ -88,7 +88,8 @@ An Apple MusicKit **developer token**: a JSON Web Token signed **ES256** with an
 Apple Media Services private key (a `.p8` downloaded once from the Apple
 Developer portal), carrying your Team ID as the `iss` claim, `iat` and `exp`, and
 your Key ID as the `kid` header. Apple caps its lifetime at six months; shorter
-is better, and the provider here is built for tokens that live about an hour.
+is better, and the provider here is built for tokens that live about an hour,
+which is the right order of magnitude for an endpoint that takes no credential.
 
 **Sign it on a server you control.** A `.p8` in an APK is extractable, and
 whoever extracts it can mint tokens against your Apple Developer Program
@@ -111,6 +112,13 @@ supply.
   the suffix appended; a trailing slash is trimmed, and any query or fragment on
   the base is dropped. The base must be an absolute `http` or `https` URL —
   anything else is refused before a request is made.
+
+  The `shazam` in that path is historical rather than a mistake: ShazamKit was
+  the endpoint's first consumer, and what it mints is a plain Apple Media
+  Services developer token with no audience or other service-specific claim, so
+  the same endpoint serves MusicKit unchanged. `CardServerDeveloperTokenProvider`
+  appends this exact path, so an endpoint that cannot serve it wants a
+  `DeveloperTokenProvider` of your own rather than a renamed route here.
 - **No body and no credential.** The request carries an empty body typed
   `application/json`, and sends no `Authorization` header, cookie or key. If your
   endpoint requires authentication, write your own `DeveloperTokenProvider`
