@@ -219,7 +219,7 @@ class CardServerDeveloperTokenProvider(
             val parsed = url?.trim()?.takeIf { it.isNotEmpty() }?.toHttpUrlOrNull()
                 ?: throw MusicKitException(
                     "The server address isn't a valid URL. Include the scheme, " +
-                        "e.g. https://mb-cards.druware.com.",
+                        "e.g. https://cards.example.com.",
                     "TOKEN_PROVIDER_FAILED",
                 )
 

@@ -63,27 +63,133 @@ either set `ANDROID_HOME` or have your outer `settings.gradle.kts` write one.
 
 ## Developer tokens
 
-**No credential is compiled into this library.** You supply one by implementing
-`DeveloperTokenProvider`:
+**No credential is compiled into this library**, and no token endpoint is
+provided with it. You supply a token by implementing `DeveloperTokenProvider`:
 
 ```kotlin
 interface DeveloperTokenProvider {
     suspend fun getToken(forceRefresh: Boolean = false): DeveloperToken
     fun invalidate()
 }
+
+data class DeveloperToken(val token: String, val expiresAt: Instant)
 ```
 
-A token lives about an hour, so `getToken` is called repeatedly rather than once.
-Implementations are expected to cache and to be safe to call from several
-coroutines at once. Sign the token on a server you control — an Apple Media
-Services private key does not belong in an APK.
+That interface is the real contract. `getToken` is called repeatedly rather than
+once, so an implementation is expected to cache, to mint a fresh token when the
+held one is near expiry, and to be safe to call from several coroutines at once.
+`invalidate()` drops the held token so the next `getToken` fetches again.
+`CardServerDeveloperTokenProvider` is the one implementation shipped here; it
+speaks HTTP, and the specification below is what it expects at the other end.
 
-`CardServerDeveloperTokenProvider` is the one concrete implementation. It fits a
-Druware Card Server, or anything that answers the same contract: one
-unauthenticated `POST {baseUrl}/api/v1/shazam/token`, no body and no credential,
-returning `200` with `{ "token": "<jwt>", "expiresAt": "<ISO-8601 UTC>" }`. The
-base URL is a `() -> String` lambda evaluated once per token request, so a host
-that lets a user edit the server address picks the new one up on the next fetch.
+### What the token is
+
+An Apple MusicKit **developer token**: a JSON Web Token signed **ES256** with an
+Apple Media Services private key (a `.p8` downloaded once from the Apple
+Developer portal), carrying your Team ID as the `iss` claim, `iat` and `exp`, and
+your Key ID as the `kid` header. Apple caps its lifetime at six months; shorter
+is better, and the provider here is built for tokens that live about an hour.
+
+**Sign it on a server you control.** A `.p8` in an APK is extractable, and
+whoever extracts it can mint tokens against your Apple Developer Program
+membership until you revoke the key. There is no configuration of this library
+that takes a private key, deliberately.
+
+### You run your own endpoint
+
+Druware does not operate a developer-token endpoint for third-party use. There is
+no shared address to point this at, and none is compiled in:
+`CardServerDeveloperTokenProvider` takes `baseUrl: () -> String` as a required
+constructor parameter with no default, so it cannot be built without one you
+supply.
+
+### The wire contract
+
+`CardServerDeveloperTokenProvider` makes exactly one call per token:
+
+- **`POST {baseUrl}/api/v1/shazam/token`.** The base URL's own path is kept and
+  the suffix appended; a trailing slash is trimmed, and any query or fragment on
+  the base is dropped. The base must be an absolute `http` or `https` URL —
+  anything else is refused before a request is made.
+- **No body and no credential.** The request carries an empty body typed
+  `application/json`, and sends no `Authorization` header, cookie or key. If your
+  endpoint requires authentication, write your own `DeveloperTokenProvider`
+  rather than bending this one; that is a supported path, not a workaround.
+- **Success is `200`** with a JSON object body:
+
+  | Field | Type | Meaning |
+  | --- | --- | --- |
+  | `token` | string | The signed JWT. Must be present and non-blank. |
+  | `expiresAt` | string | ISO-8601 timestamp for when it stops being usable. |
+
+  Field names are read case-insensitively, so `Token` and `ExpiresAt` are
+  accepted. An explicit offset on `expiresAt` is honoured; a timestamp carrying
+  none is taken as UTC. A missing or unreadable `expiresAt` is not an error — the
+  token is trusted for five minutes and then re-fetched.
+- **Errors use one envelope**, `{"error":{"code":"...","message":"..."}}`. The
+  `message` is surfaced to the caller as the `MusicKitException` message and the
+  `code` as its `code`, so write messages fit to show a user. Nothing else from
+  the response body is ever echoed.
+
+Every failure arrives as a `MusicKitException`:
+
+| Condition | `code` |
+| --- | --- |
+| `baseUrl` is not an absolute HTTP(S) URL | `TOKEN_PROVIDER_FAILED` |
+| The host could not be reached | `TOKEN_PROVIDER_FAILED` |
+| A `200` whose body is not a JSON object | `TOKEN_PROVIDER_FAILED` |
+| A `200` with a missing or blank `token` | `TOKEN_PROVIDER_FAILED` |
+| `429`, after the retries below | `429` |
+| An envelope whose code is `SHAZAM_NOT_CONFIGURED` | `SHAZAM_NOT_CONFIGURED` |
+| Any other envelope carrying a code | that code, verbatim |
+| Any other status, with no readable envelope | the HTTP status, as a string |
+
+`SHAZAM_NOT_CONFIGURED` is the one code with a message of its own — it means the
+endpoint is running but has no Apple key configured, which is a deployment
+mistake rather than a transient fault, and worth saying so plainly. Answer it
+with `503`.
+
+### Behaviour to honour
+
+- **Expiry.** The provider refreshes **60 seconds ahead** of `expiresAt` rather
+  than at it, so a token minted with less than a minute of life left causes a
+  fetch on every single call. Mint with real headroom.
+- **`429`.** A `429` is retried up to **three** times after the first attempt.
+  The backoff starts at 500 ms, doubles per attempt, and adds up to another whole
+  step of jitter, landing uniformly in `[step, 2 × step)`. A fourth consecutive
+  `429` surfaces as a failure. Rate-limiting per IP is reasonable, but note that
+  a venue full of devices is one public IP — the jitter exists for exactly that.
+  No other status is retried.
+- **The address is re-read per request.** `baseUrl` is a lambda evaluated once
+  per token fetch, so a host that lets a user edit the server address picks up
+  the new one on the next fetch without rebuilding the provider.
+
+### Worked examples
+
+A successful `200`:
+
+```json
+{
+  "token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IkFCQzEyM0RFRjQifQ.eyJpc3MiOiIxMjM0NTZBQkNEIiwiaWF0IjoxNzU3MzAwMDAwLCJleHAiOjE3NTczMDM2MDB9.Ll5s1Rb3-signature",
+  "expiresAt": "2030-01-02T03:04:05Z"
+}
+```
+
+A `503` from an endpoint with no Apple key installed:
+
+```json
+{
+  "error": {
+    "code": "SHAZAM_NOT_CONFIGURED",
+    "message": "No Apple Media Services key is configured."
+  }
+}
+```
+
+Which reaches the caller as a `MusicKitException` with code
+`SHAZAM_NOT_CONFIGURED`.
+
+### Wiring it up
 
 Hand the provider to `MusicKitOptions` and create a host:
 
